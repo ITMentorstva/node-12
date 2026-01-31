@@ -3,12 +3,14 @@ const path = require('path');
 const fs = require('fs');
 const emitter = require('../events/emitter');
 const ejs = require('ejs');
-const { products } = require('../data/products');
+const { getAllProducts } = require('../services/productService');
 
-function handlePage(req, res) {
+async function handlePage(req, res) {
 
     const homePath = path.join(__dirname, '../..', 'views/pages/home.ejs');
     const layoutPath = path.join(__dirname, '../..', 'views/layout.ejs');
+
+    const products = await getAllProducts();
 
     ejs.renderFile(homePath, {name: "Marko", products: products}, (err, html) => {
 

@@ -3,11 +3,11 @@ const http = require('http');
 const { handleStaticFiles } = require('./src/handlers/staticHandler');
 const { handleApiCall } = require('./src/handlers/apiHandler');
 const { handlePage, handleAboutPage } = require('./src/handlers/pageHandler');
-const { products } = require('./src/data/products');
+const { getAllUsers } = require('./src/services/userService');
 
 require('./src/listeners/pageListener');
 
-const server = http.createServer( (req, res) => {
+const server = http.createServer( async (req, res) => {
 
     if(req.url.startsWith('/public/')) {
         handleStaticFiles(req, res);
@@ -18,24 +18,27 @@ const server = http.createServer( (req, res) => {
     }
 
     if(req.url === '/') {
-        handlePage(req, res);
+
+        const data = await getAllUsers();
+
+        await handlePage(req, res);
         return;
     } else if(req.url === '/about') {
         handleAboutPage(req, res);
         return;
     }
 
-    const productMatch = req.url.match(/^\/product\/([\w-]+)$/);
-    if(productMatch) {
-
-        const slug = productMatch[1];
-        const product = products.find(p => p.slug === slug);
-
-        if(product) {
-            res.writeHead(200, { "Content-Type": 'text/plain' });
-            return res.end("Hello ");
-        }
-    }
+    // const productMatch = req.url.match(/^\/product\/([\w-]+)$/);
+    // if(productMatch) {
+    //
+    //     const slug = productMatch[1];
+    //     const product = products.find(p => p.slug === slug);
+    //
+    //     if(product) {
+    //         res.writeHead(200, { "Content-Type": 'text/plain' });
+    //         return res.end("Hello ");
+    //     }
+    // }
 
     res.writeHead(404, { "Content-Type": 'text/plain' });
     return res.end("404 page not found");
